@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable private fun OtherPage(tab:String, likes:Int, back:()->Unit) {
-    Column(Modifier.weight(1f).fillMaxWidth().padding(22.dp), verticalArrangement=Arrangement.spacedBy(14.dp)) {
+    Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement=Arrangement.spacedBy(14.dp)) {
         Text(tab, color=Color.White, fontSize=26.sp, fontWeight=FontWeight.Bold)
         when(tab) {
             "Likes" -> { Text("$likes profiles liked", color=Muted); Text("Your liked profiles will appear here.", color=Muted) }
