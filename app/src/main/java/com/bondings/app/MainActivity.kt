@@ -50,7 +50,9 @@ class MainActivity : ComponentActivity() {
     MaterialTheme(colorScheme = darkColorScheme(background=Bg, surface=Panel, primary=Pink)) {
         Surface(Modifier.fillMaxSize(), color=Bg) {
             Column {
-                if (tab == "Discover") {
+                if (tab == "Reels") {
+                    ReelsPage()
+                } else if (tab == "Discover") {
                     Row(Modifier.fillMaxWidth().padding(horizontal=18.dp, vertical=14.dp), verticalAlignment=Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { Text("BONDINGS", color=Color.White, fontSize=23.sp, fontWeight=FontWeight.Black, letterSpacing=1.5.sp); Text("Find your kind of connection", color=Muted, fontSize=11.sp) }
                         IconButton(onClick={filter=true}) { Icon(Icons.Default.Tune, null, tint=Color.White) }
@@ -75,8 +77,8 @@ class MainActivity : ComponentActivity() {
                     }
                 } else { OtherPage(tab, liked.size) { tab="Discover" } }
                 NavigationBar(containerColor=Color(0xFF17101F), contentColor=Muted, tonalElevation=0.dp) {
-                    listOf("Discover","Likes","Chat","Premium","Profile").forEach { item ->
-                        NavigationBarItem(selected=tab==item, onClick={tab=item}, icon={ Icon(when(item){"Discover"->Icons.Default.GridView;"Likes"->Icons.Default.FavoriteBorder;"Chat"->Icons.Default.ChatBubbleOutline;"Premium"->Icons.Default.WorkspacePremium;else->Icons.Default.Person}, null) }, label={Text(item, fontSize=9.sp)}, colors=NavigationBarItemDefaults.colors(selectedIconColor=Pink, selectedTextColor=Pink, indicatorColor=Color(0xFF38213B), unselectedIconColor=Muted, unselectedTextColor=Muted))
+                    listOf("Discover","Reels","Likes","Chat","Premium","Profile").forEach { item ->
+                        NavigationBarItem(selected=tab==item, onClick={tab=item}, icon={ Icon(when(item){"Discover"->Icons.Default.GridView;"Reels"->Icons.Default.PlayCircle;"Likes"->Icons.Default.FavoriteBorder;"Chat"->Icons.Default.ChatBubbleOutline;"Premium"->Icons.Default.WorkspacePremium;else->Icons.Default.Person}, null) }, label={Text(item, fontSize=9.sp)}, colors=NavigationBarItemDefaults.colors(selectedIconColor=Pink, selectedTextColor=Pink, indicatorColor=Color(0xFF38213B), unselectedIconColor=Muted, unselectedTextColor=Muted))
                     }
                 }
             }
@@ -104,4 +106,46 @@ class MainActivity : ComponentActivity() {
 }
 @Composable private fun PlanCard(title:String, price:String, features:List<String>) {
     Card(colors=CardDefaults.cardColors(containerColor=Panel), shape=RoundedCornerShape(18.dp)) { Column(Modifier.padding(17.dp), verticalArrangement=Arrangement.spacedBy(8.dp)) { Text(title, color=Pink, fontWeight=FontWeight.Bold); Text(price, color=Color.White, fontSize=22.sp, fontWeight=FontWeight.Bold); features.forEach { Text("✓  $it", color=Muted, fontSize=13.sp) }; OutlinedButton(onClick={}, enabled=false){Text("Coming soon")} } }
+}
+
+
+@Composable private fun ReelsPage() {
+    var showUpload by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxSize().background(Bg)) {
+        Row(Modifier.fillMaxWidth().padding(horizontal=18.dp, vertical=14.dp), verticalAlignment=Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("BONDINGS REELS", color=Color.White, fontSize=21.sp, fontWeight=FontWeight.Black)
+                Text("Members-only videos", color=Muted, fontSize=11.sp)
+            }
+            Button(onClick={showUpload=true}, colors=ButtonDefaults.buttonColors(containerColor=Pink), contentPadding=PaddingValues(horizontal=14.dp, vertical=8.dp)) {
+                Icon(Icons.Default.Add, null); Spacer(Modifier.width(5.dp)); Text("Create")
+            }
+        }
+        Text("Only signed-in members with a completed BONDINGS profile can watch and post reels.", color=Muted, fontSize=12.sp, modifier=Modifier.padding(horizontal=18.dp, vertical=4.dp))
+        LazyColumn(contentPadding=PaddingValues(14.dp), verticalArrangement=Arrangement.spacedBy(16.dp)) {
+            items(listOf(
+                Triple("Aarav", "Weekend vibes ✨", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900"),
+                Triple("Rohan", "A little city walk 🌆", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900")
+            )) { reel ->
+                Card(shape=RoundedCornerShape(20.dp), colors=CardDefaults.cardColors(containerColor=Panel)) {
+                    Box(Modifier.fillMaxWidth().height(430.dp)) {
+                        AsyncImage(reel.third, reel.first, Modifier.fillMaxSize(), contentScale=ContentScale.Crop)
+                        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color(0xDD08060C)))))
+                        Column(Modifier.align(Alignment.BottomStart).padding(16.dp)) {
+                            Text("@${reel.first}", color=Color.White, fontWeight=FontWeight.Bold, fontSize=17.sp)
+                            Text(reel.second, color=Color.White, fontSize=13.sp)
+                            Text("Sample preview · member feed", color=Color(0xFFE2D9E9), fontSize=10.sp)
+                        }
+                        Column(Modifier.align(Alignment.CenterEnd).padding(10.dp), horizontalAlignment=Alignment.CenterHorizontally) {
+                            IconButton(onClick={}) { Icon(Icons.Default.FavoriteBorder, null, tint=Color.White) }
+                            Text("Like", color=Color.White, fontSize=10.sp)
+                            IconButton(onClick={}) { Icon(Icons.Default.ModeComment, null, tint=Color.White) }
+                            Text("Comment", color=Color.White, fontSize=10.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if(showUpload) AlertDialog(onDismissRequest={showUpload=false}, containerColor=Panel, title={Text("Create a reel", color=Color.White)}, text={Text("Video upload will be enabled after Supabase login and private storage are connected. Only completed member profiles can publish.", color=Muted)}, confirmButton={TextButton(onClick={showUpload=false}) { Text("Got it", color=Pink) }})
 }
